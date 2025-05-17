@@ -55,7 +55,7 @@
                     <input type="text" placeholder="Correo Electrónico" name="correo">
                     <input type="password" placeholder="Contraseña" name="contrasena">
                     <!-- Botón de inicio de sesión -->
-                    <button>Iniciar Sesión</button>
+                    <button onClick= "location.href='html/DashBoard.html'">Iniciar Sesión</button>
                 </form>
 
                 <!-- **Formulario de registro** -->

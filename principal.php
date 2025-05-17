@@ -18,34 +18,57 @@
         // Termina la ejecución del script para evitar que el usuario acceda al contenido de la página
         die();
     }
-
-    // **Comentario sobre funcionalidad futura**
-    // Si en algún momento quieres permitir que el usuario cierre la sesión automáticamente,
-    // puedes descomentar la siguiente línea para destruir la sesión al cargar la página:
-    // session_destroy();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Especifica el conjunto de caracteres para el documento -->
     <meta charset="UTF-8">
-    <!-- Permite que el diseño sea responsivo, adaptándose a diferentes dispositivos -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Título de la página que aparece en la pestaña del navegador -->
     <title>Bienvenido</title>
-    <!-- Vincula un archivo de estilo CSS externo para la personalización de la interfaz -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/stylesDashBoard.css">
 </head>
 <body>
-    <!-- Mensaje principal de bienvenida en la página -->
-    <h1>
-        Bienvenido a la página principal
-    </h1>
-    <!-- Enlace para cerrar sesión, redirige al script encargado de manejar el cierre de sesión -->
-    <a href="php/cerrar_sesion.php">Cerrar sesión</a>
+                <div class="mensaje_bienvenida">
+                <h1>Bienvenido a la página principal</h1>
+            </div>
+    <div class="main-container">
+        <!-- Barra lateral (Dashboard) -->
+        <div class="sidebar">
+            <div class="user-info">
+                <p><strong>Nombre:</strong> <?php echo $_SESSION['usuario']; ?></p>
+                <button class="btn">Perfil</button>
+                <a href="php/cerrar_sesion.php" class="btn">Salir</a>
+            </div>
+            <div class="php-version">
+                <p><strong>Versión PHP:</strong> <?php echo phpversion(); ?></p>
+            </div>
+        </div>
+        <!-- Contenido principal -->
+        <div class="content">
+
+            <div class="pin_container">
+                <!-- Aquí las tarjetas -->
+                <div class="card card_small"></div>
+                <div class="card card_medium"></div>
+                <div class="card card_large"></div>
+                <div class="card card_small"></div>
+                <div class="card card_medium"></div>
+                <div class="card card_large"></div>
+                <div class="card card_small"></div>
+                <div class="card card_medium"></div>
+                <div class="card card_large"></div>
+                <div class="card card_small"></div>
+                <div class="card card_medium"></div>
+                <div class="card card_large"></div>
+                <div class="card card_small"></div>
+                <div class="card card_medium"></div>
+                <div class="card card_large"></div>
+                <div class="card card_small"></div>
+                <div class="card card_medium"></div>
+                <div class="card card_large"></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
-<?php
-    // Imprime la versión de PHP que está ejecutándose en el servidor
-    echo 'Versión de PHP: ' . phpversion();
-?>
