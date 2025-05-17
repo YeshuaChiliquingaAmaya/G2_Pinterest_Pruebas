@@ -8,7 +8,7 @@
     $username = "u4djfg6dudvl6mmr";
 
     // Contraseña asociada al usuario de la base de datos
-    $password = "uxC0t0MCa0RyNKRoew80";
+    $password = "WwCpfcsVcAEsYHuP47Mh";
 
     // Nombre de la base de datos a la que se desea conectar
     $database = "biokskqzeaoic27nghad";
