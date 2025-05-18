@@ -6,7 +6,7 @@
     // Si existe la variable de sesión 'usuario', significa que el usuario ya está autenticado.
     if(isset($_SESSION['usuario'])){
         // Redirigir al usuario a la página principal
-        header('Location: principal.php');
+        header('Location: html/DashBoard.php');
     }
 ?>
 <!DOCTYPE html>
@@ -55,7 +55,7 @@
                     <input type="text" placeholder="Correo Electrónico" name="correo">
                     <input type="password" placeholder="Contraseña" name="contrasena">
                     <!-- Botón de inicio de sesión -->
-                    <button onClick= "location.href='html/DashBoard.html'">Iniciar Sesión</button>
+                    <button type = "submit" >Iniciar Sesión</button>
                 </form>
 
                 <!-- **Formulario de registro** -->

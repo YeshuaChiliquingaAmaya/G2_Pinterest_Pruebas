@@ -1,39 +1,44 @@
 <?php
+session_start();
+include 'conexion_be.php';
 
-    // Iniciar la sesión
-    session_start();
+// Validar datos recibidos
+if (empty($_POST['correo']) || empty($_POST['contrasena'])) {
+    die("Error: Correo y contraseña son obligatorios");
+}
 
-    // Incluir el archivo de conexión a la base de datos
-    include 'conexion_be.php';
+$correo = trim($_POST['correo']);
+$contrasena = hash('sha512', $_POST['contrasena']); // Encriptar
 
-    // **Recibir los datos del formulario de inicio de sesión**
-    // Estos datos se envían mediante el método POST desde un formulario.
-    $correo = $_POST['correo'];           // Correo ingresado por el usuario
-    $contrasena = $_POST['contrasena'];   // Contraseña ingresada por el usuario
+// Consulta preparada para evitar SQL Injection
+$query = "SELECT id, nombre_completo, usuario FROM usuarios WHERE correo = ? AND contrasena = ?";
+$stmt = $conexion->prepare($query);
 
-    // **Encriptar la contraseña**
-    // Se encripta la contraseña ingresada usando el algoritmo `sha512` para compararla con la contraseña almacenada en la base de datos.
-    $contrasena = hash('sha512', $contrasena);
+if (!$stmt) {
+    die("Error en la consulta: " . $conexion->error);
+}
 
-    // **Validar las credenciales del usuario**
-    // Se ejecuta una consulta SQL para buscar un usuario que coincida con el correo y la contraseña proporcionados.
-    $validar_login = mysqli_query($conexion, "SELECT * FROM usuarios WHERE correo = '$correo' AND contrasena = '$contrasena'");
+$stmt->bind_param("ss", $correo, $contrasena);
+$stmt->execute();
+$result = $stmt->get_result();
 
-    // **Verificar si la consulta encontró un resultado**
-    if(mysqli_num_rows($validar_login) > 0) {
-        // Si se encuentra un usuario que coincida:
-        $_SESSION['usuario'] = $correo; // Se guarda el correo del usuario en la sesión para futuras operaciones.
-        header("location:../principal.php"); // Redirige al usuario a la página principal.
-        exit(); // Detiene la ejecución del script.
-    } else {
-        // Si no se encuentra ningún usuario que coincida:
-        echo '
-            <script>
-                alert("Usuario no encontrado, por favor verifique los datos introducidos");
-                window.location = "../index.php"; // Redirige al formulario de inicio de sesión.
-            </script>
-        ';
-        exit(); // Detiene la ejecución del script.
-    }
-
+if ($result->num_rows > 0) {
+    $usuario = $result->fetch_assoc();
+    
+    // Guardar datos en sesión
+    $_SESSION['usuario'] = [
+        'id' => $usuario['id'],
+        'nombre' => $usuario['nombre_completo'],
+        'usuario' => $usuario['usuario']
+    ];
+    
+    header("Location: ../html/DashBoard.php");
+    exit();
+} else {
+    echo '<script>
+        alert("Usuario o contraseña incorrectos");
+        window.location = "../index.php";
+    </script>';
+    exit();
+}
 ?>
