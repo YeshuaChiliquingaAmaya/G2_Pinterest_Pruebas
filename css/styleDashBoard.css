@@ -1,95 +1,112 @@
 :root {
-    --card_width: 250px;
-    --card_border_radius: 16px;
-    --row_increment: 10px;
-    --card_small: 26;
-    --card_medium: 33;
-    --card_large: 45;
+  --card_width: 250px;
+  --card_border_radius: 16px;
+  --row_increment: 10px;
+  --card_small: 26;
+  --card_medium: 33;
+  --card_large: 45;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    background-color: grey;
-    font-family: Arial, sans-serif;
-}
-
-.main-container {
-    display: flex;
-    height: 100vh;
-}
-
-.sidebar {
-    width: 25vw;
-    background-color: #333;
-    color: white;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.user-info {
-    margin-bottom: 20px;
-}
-
-.user-info p {
-    margin: 10px 0;
-}
-
-.user-info .btn {
-    background-color: #444;
-    color: white;
-    border: none;
-    padding: 10px;
-    margin: 5px 0;
-    text-align: center;
-    cursor: pointer;
-    width: 100%;
-}
-
-.user-info .btn:hover {
-    background-color: #555;
-}
-
-.php-version {
-    margin-top: 20px;
-}
-
-.content {
-    width: 75vw;
-    padding: 20px;
-    background-color: #f4f4f4;
+  background-color: grey;
+  font-family: Arial, sans-serif;
 }
 
 .mensaje_bienvenida {
-    text-align: center;
-    margin-bottom: 20px;
+  background: #ccc;
+  padding: 10px;
+  text-align: center;
 }
 
+.main-container {
+  display: flex;
+  height: calc(100vh - 52px); /* resta la altura del mensaje de bienvenida */
+}
+
+/* Sidebar */
+.sidebar {
+  width: 25vw;
+  background-color: #333;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Botones dentro del sidebar */
+.btn {
+  display: block;
+  background-color: #444;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin: 10px 0;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 4px;
+  width: 100%;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background-color: #555;
+}
+
+/* Versión de PHP */
+.php-version {
+  font-size: 12px;
+  color: #ccc;
+  text-align: center;
+}
+
+/* Contenido (grid de imágenes) */
+.content {
+  flex: 1;
+  background-color: #f4f4f4;
+  overflow-y: auto;
+}
+
+/* Grid masonry */
 .pin_container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, var(--card_width));
-    grid-auto-rows: var(--row_increment);
-    justify-content: center;
-    background-color: black;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--card_width), 1fr));
+  grid-auto-rows: var(--row_increment);
+  gap: 15px;
+  justify-content: center;
+  background-color: black;
+  padding: 20px;
 }
 
+/* Tarjeta base */
 .card {
-    padding: 0px;
-    margin: 15px 10px;
-    border-radius: var(--card_border_radius);
-    background-color: white;
+  position: relative;
+  overflow: hidden;
+  background-color: white;
+  border-radius: var(--card_border_radius);
 }
 
-.card_small {
-    grid-row-end: span var(--card_small);
+/* Imagen que llena la tarjeta */
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.card_medium {
-    grid-row-end: span var(--card_medium);
+/* Placeholder vacío */
+.card.placeholder {
+  background: #fff;
+  border: 2px dashed #ccc;
 }
 
-.card_large {
-    grid-row-end: span var(--card_large);
-}
+/* Control de altura de cada tarjeta en el grid */
+.card_small  { grid-row-end: span var(--card_small); }
+.card_medium { grid-row-end: span var(--card_medium); }
+.card_large  { grid-row-end: span var(--card_large); }

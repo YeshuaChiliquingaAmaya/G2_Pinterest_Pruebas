@@ -6,7 +6,7 @@
     // Si existe la variable de sesión 'usuario', significa que el usuario ya está autenticado.
     if(isset($_SESSION['usuario'])){
         // Redirigir al usuario a la página principal
-        header('Location: html/DashBoard.php');
+        header('Location: principal.php');
     }
 ?>
 <!DOCTYPE html>
