@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login y Registro - GyroZeppeli</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  <main>
+    <div class="contenedor__todo">
+      <div class="caja__trasera">
+        <div class="caja__trasera-login">
+          <h3>¿Ya tienes una cuenta?</h3>
+          <p>Inicia sesión para entrar a la página</p>
+          <button id="btn__iniciar-sesion">Iniciar Sesión</button>
+        </div>
+        <div class="caja__trasera-register">
+          <h3>¿Aún no tienes una cuenta?</h3>
+          <p>Regístrate para que puedas iniciar sesión</p>
+          <button id="btn__registrarse">Registrarse</button>
+        </div>
+      </div>
+
+      <div class="contenedor__login-register" id="contenedor">
+        <!-- LOGIN -->
+        <form id="loginForm" class="formulario__login">
+          <h2>Iniciar Sesión</h2>
+          <input type="email"    placeholder="Correo Electrónico" name="correo"    required>
+          <input type="password" placeholder="Contraseña"        name="contrasena" required>
+          <button type="submit">Entrar</button>
+        </form>
+
+        <!-- REGISTER -->
+        <form id="registerForm" class="formulario__register">
+          <h2>Registrarse</h2>
+          <input type="text"     placeholder="Nombre Completo"    name="nombre_completo" required>
+          <input type="email"    placeholder="Correo Electrónico"  name="correo"          required>
+          <input type="text"     placeholder="Usuario"             name="usuario"         required>
+          <input type="password" placeholder="Contraseña"          name="contrasena"      required>
+          <button type="submit">Crear Cuenta</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Toggle entre Login y Registro
+    const cont = document.getElementById("contenedor");
+    document.getElementById("btn__registrarse")
+      .addEventListener("click", () => cont.style.left = "50%");
+    document.getElementById("btn__iniciar-sesion")
+      .addEventListener("click", () => cont.style.left = "0");
+
+    // LOGIN
+    document.getElementById("loginForm")
+      .addEventListener("submit", async e => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target));
+        const res  = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (result.success) {
+          localStorage.setItem("userId", result.user.id);
+          window.location.href = "/home.html";
+        } else {
+          alert("Error: " + result.message);
+        }
+      });
+
+    // REGISTER
+    document.getElementById("registerForm")
+      .addEventListener("submit", async e => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target));
+        const res  = await fetch("/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert("Usuario creado. Ahora inicia sesión.");
+          // Volvemos al login
+          cont.style.left = "0";
+        } else {
+          alert("Error: " + result.message);
+        }
+      });
+  </script>
+</body>
+</html>
