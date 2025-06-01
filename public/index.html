@@ -2,90 +2,312 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login y Registro - Pinterest</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,1,0" />
+    <link rel="icon" type="image/x-icon" href="images/Pinterest_Icon.png">
+    <title>Pinterest Clone</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Estilos para el formulario de login/registro */
+        .auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .auth-form {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .auth-form h2 {
+            margin-bottom: 1.5rem;
+            color: #111111;
+        }
+        
+        .auth-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .auth-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: #e60023;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-form button:hover {
+            background-color: #ad081b;
+        }
+        
+        .auth-toggle {
+            color: #111111;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <main>
-    <div class="contenedor__todo">
-      <div class="caja__trasera">
-        <div class="caja__trasera-login">
-          <h3>¿Ya tienes una cuenta?</h3>
-          <p>Inicia sesión para entrar a la página</p>
-          <button id="btn__iniciar-sesion">Iniciar Sesión</button>
+    <!-- Contenedor de autenticación (inicialmente visible) -->
+    <div id="authContainer" class="auth-container">
+        <div class="auth-form">
+            <h2>Bienvenido a Pinterest</h2>
+            <form id="loginForm">
+                <input type="email" placeholder="Correo Electrónico" name="correo" required>
+                <input type="password" placeholder="Contraseña" name="contrasena" required>
+                <button type="submit">Iniciar sesión</button>
+                <p>¿No tienes una cuenta? <span id="showRegister" class="auth-toggle">Regístrate</span></p>
+            </form>
+            
+            <form id="registerForm" style="display: none;">
+                <input type="text" placeholder="Nombre Completo" name="nombre_completo" required>
+                <input type="email" placeholder="Correo Electrónico" name="correo" required>
+                <input type="text" placeholder="Usuario" name="usuario" required>
+                <input type="password" placeholder="Contraseña" name="contrasena" required>
+                <button type="submit">Crear cuenta</button>
+                <p>¿Ya tienes una cuenta? <span id="showLogin" class="auth-toggle">Inicia sesión</span></p>
+            </form>
         </div>
-        <div class="caja__trasera-register">
-          <h3>¿Aún no tienes una cuenta?</h3>
-          <p>Regístrate para que puedas iniciar sesión</p>
-          <button id="btn__registrarse">Registrarse</button>
-        </div>
-      </div>
-
-      <div class="contenedor__login-register" id="contenedor">
-        <!-- LOGIN -->
-        <form id="loginForm" class="formulario__login">
-          <h2>Iniciar Sesión</h2>
-          <input type="email"    placeholder="Correo Electrónico" name="correo"    required>
-          <input type="password" placeholder="Contraseña"        name="contrasena" required>
-          <button type="submit">Entrar</button>
-        </form>
-
-        <!-- REGISTER -->
-        <form id="registerForm" class="formulario__register">
-          <h2>Registrarse</h2>
-          <input type="text"     placeholder="Nombre Completo"    name="nombre_completo" required>
-          <input type="email"    placeholder="Correo Electrónico"  name="correo"          required>
-          <input type="text"     placeholder="Usuario"             name="usuario"         required>
-          <input type="password" placeholder="Contraseña"          name="contrasena"      required>
-          <button type="submit">Crear Cuenta</button>
-        </form>
-      </div>
     </div>
-  </main>
 
-    <script src="assets/js/script.js"></script>
+    <!-- Contenido principal de Pinterest (inicialmente oculto) -->
+    <div id="pinterestContent" style="display: none;">
+        <header>
+            <nav id="navbar-pinterest">
+                <a href="#"><img src="images/Pinterest_Icon.png" alt="Pinterest_Icon" id="pinterest-icon"></a>
+                <div class="left-itmes">
+                    <ul class="first">
+                        <li><a href="#" id="inicio">Inicio</a></li>
+                        <li><a href="#" id="hoy">Hoy</a></li>
+                        <li>
+                            <div class="crear">
+                                <a href="#">Crear</a>
+                                <span class="material-symbols-outlined">expand_more</span>
+                                <ul class="menu">
+                                    <li>Crear un Idea Pin</li>
+                                    <li>Crear Pin</li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="search">
+                    <div class="barra">
+                        <div><span class="material-symbols-outlined" id="lupa">search</span></div>
+                        <input type="text" placeholder="Buscar" class="finder">
+                    </div>
+                </div>
+                <div class="right-items">
+                    <span class="material-symbols-outlined" id="notifications">notifications</span>
+                    <span class="material-symbols-outlined" id="message">sms</span>
+                    <span class="material-symbols-outlined" id="profile-img">account_circle</span>
+                    <span class="material-symbols-outlined" id="logoutBtn">logout</span>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Contenido de imágenes -->
+        <main class="contenido">
+            <div id="imageGrid" class="imagenes">
+                <!-- Las imágenes se cargarán dinámicamente aquí -->
+            </div>
+        </main>
+
+        <!-- Formulario para subir imágenes -->
+        <div id="uploadContainer" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" name="image" id="fileInput" style="display: none;">
+                <button type="button" id="uploadButton" style="background-color: #e60023; color: white; border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 24px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">+</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // LOGIN
-        document.getElementById("loginForm")
-            .addEventListener("submit", async e => {
-                e.preventDefault();
-                const data = Object.fromEntries(new FormData(e.target));
-                const res = await fetch("/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data)
-                });
-                const result = await res.json();
-                if (result.success) {
-                    localStorage.setItem("userId", result.user.id);
-                    window.location.href = "/home.html";
-                } else {
-                    alert("Error: " + result.message);
-                }
-            });
+        // Elementos del DOM
+        const authContainer = document.getElementById('authContainer');
+        const pinterestContent = document.getElementById('pinterestContent');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const uploadButton = document.getElementById('uploadButton');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+        const imageGrid = document.getElementById('imageGrid');
+        const logoutBtn = document.getElementById('logoutBtn');
 
-        // REGISTER
-        document.getElementById("registerForm")
-            .addEventListener("submit", async e => {
-                e.preventDefault();
-                const data = Object.fromEntries(new FormData(e.target));
-                const res = await fetch("/register", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+        // Verificar si el usuario ya está autenticado
+        function checkAuth() {
+            const userId = localStorage.getItem('userId');
+            if (userId) {
+                authContainer.style.display = 'none';
+                pinterestContent.style.display = 'block';
+                loadImages();
+            } else {
+                authContainer.style.display = 'flex';
+                pinterestContent.style.display = 'none';
+            }
+        }
+
+        // Cargar imágenes
+        async function loadImages() {
+            try {
+                const response = await fetch('/api/images');
+                const images = await response.json();
+                
+                imageGrid.innerHTML = ''; // Limpiar el contenedor
+                
+                images.forEach(img => {
+                    const imageCard = document.createElement('div');
+                    imageCard.className = 'card-image';
+                    imageCard.innerHTML = `
+                        <img src="${img.url}" alt="Imagen" class="img">
+                        <button class="button">Guardar</button>
+                        <span class="material-symbols-outlined oculto-1">upload</span>
+                        <span class="material-symbols-outlined oculto-2">more_horiz</span>
+                    `;
+                    imageGrid.appendChild(imageCard);
+                });
+                
+                // Mostrar el botón de subir imagen
+                document.getElementById('uploadContainer').style.display = 'block';
+            } catch (error) {
+                console.error('Error al cargar imágenes:', error);
+            }
+        }
+
+        // Event listeners para los formularios
+        showRegister.addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        });
+
+        showLogin.addEventListener('click', () => {
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+
+        // Login
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(loginForm);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify(data)
                 });
-                const result = await res.json();
+                
+                const result = await response.json();
+                
                 if (result.success) {
-                    alert("Usuario creado. Ahora inicia sesión.");
-                    // Volvemos al login
-                    document.querySelector('.contenedor__login-register').style.left = "0";
+                    localStorage.setItem('userId', result.user.id);
+                    checkAuth();
                 } else {
-                    alert("Error: " + result.message);
+                    alert('Error: ' + result.message);
                 }
-            });
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al iniciar sesión');
+            }
+        });
+
+        // Registro
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(registerForm);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Usuario creado con éxito. Por favor inicia sesión.');
+                    registerForm.reset();
+                    registerForm.style.display = 'none';
+                    loginForm.style.display = 'block';
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al registrar el usuario');
+            }
+        });
+
+        // Subir imagen
+        uploadButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', async () => {
+            if (fileInput.files.length > 0) {
+                const formData = new FormData(uploadForm);
+                const userId = localStorage.getItem('userId');
+                
+                try {
+                    const response = await fetch(`/upload?user_id=${userId}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.url) {
+                        loadImages(); // Recargar imágenes
+                    } else {
+                        alert('Error al subir la imagen');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al subir la imagen');
+                }
+            }
+        });
+
+        // Cerrar sesión
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('userId');
+            checkAuth();
+        });
+
+        // Inicializar la aplicación
+        checkAuth();
     </script>
 </body>
 </html>
