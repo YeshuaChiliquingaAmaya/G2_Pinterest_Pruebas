@@ -97,8 +97,13 @@
     <div id="pinterestContent" style="display: none;">
         <header>
             <nav id="navbar-pinterest">
-                <a href="#"><img src="images/Pinterest_Icon.png" alt="Pinterest_Icon" id="pinterest-icon"></a>
-                <div class="left-itmes">
+                <button class="menu-toggle" id="menuToggle">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <a href="#" class="logo">
+                    <img src="images/Pinterest_Icon.png" alt="Pinterest_Icon" id="pinterest-icon">
+                </a>
+                <div class="left-itmes" id="mainNav">
                     <ul class="first">
                         <li><a href="#" id="inicio">Inicio</a></li>
                         <li><a href="#" id="hoy">Hoy</a></li>
@@ -149,6 +154,25 @@
         // Elementos del DOM
         const authContainer = document.getElementById('authContainer');
         const pinterestContent = document.getElementById('pinterestContent');
+        const menuToggle = document.getElementById('menuToggle');
+        const mainNav = document.getElementById('mainNav');
+        
+        // Toggle del menú móvil
+        if (menuToggle && mainNav) {
+            menuToggle.addEventListener('click', () => {
+                mainNav.classList.toggle('active');
+            });
+            
+            // Cerrar menú al hacer clic en un enlace
+            const navLinks = mainNav.querySelectorAll('a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        mainNav.classList.remove('active');
+                    }
+                });
+            });
+        }
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const showRegister = document.getElementById('showRegister');

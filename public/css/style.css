@@ -11,19 +11,239 @@ body {
 
 
 /* Header Nav */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
 
 header nav {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 98vw;
-    height: 80px;
-    font-size: 16px;
-    padding: 0px 16px;
-    position: fixed;
-    background-color: white;
-    z-index: 1;
+    height: 56px;
+    padding: 0 16px;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Menú Hamburguesa */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    margin-right: 8px;
+}
+
+/* Contenedores de navegación */
+.left-itmes, .right-items {
+    display: flex;
+    align-items: center;
+}
+
+/* Estilos para móvil */
+@media (max-width: 768px) {
+    /* Ajustes generales del navbar */
+    header nav {
+        padding: 0 8px;
+        flex-wrap: nowrap;
+    }
+    
+    /* Logo */
+    .logo {
+        margin-right: 8px;
+    }
+    
+    /* Botón de menú */
+    .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
+        margin: 0;
+        background: none;
+        border: none;
+    }
+    
+    /* Barra de búsqueda */
+    .search {
+        flex: 1 1 auto;
+        min-width: 60px;
+        max-width: 200px;
+        margin: 0 8px;
+        position: relative;
+    }
+
+    .search .barra {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        background: #efefef;
+        border-radius: 20px;
+        padding: 4px 12px;
+    }
+
+    .search input {
+        width: 100%;
+        border: none;
+        background: transparent;
+        padding: 8px 4px 8px 8px;
+        font-size: 14px;
+        outline: none;
+    }
+
+    .search #lupa {
+        color: #767676;
+        font-size: 20px;
+        margin-right: 4px;
+    }
+    
+    /* Menú desplegable */
+    .left-itmes {
+        display: none;
+        position: absolute;
+        top: 56px;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 16px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        flex-direction: column;
+        align-items: flex-start;
+        z-index: 1000;
+    }
+    
+    .left-itmes.active {
+        display: flex;
+    }
+    
+    /* Botones de la derecha */
+    .right-items {
+        display: flex;
+        margin-left: 8px;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    /* Ocultar íconos menos importantes en móvil */
+    .right-items .material-symbols-outlined:not(#logoutBtn) {
+        display: none;
+    }
+    
+    /* Estilo del botón de logout */
+    #logoutBtn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        margin: 0;
+        padding: 0;
+        background: rgba(230, 0, 35, 0.1);
+        border-radius: 50%;
+        color: #e60023;
+        font-size: 22px;
+        text-decoration: none;
+    }
+    
+    #logoutBtn:hover {
+        background: rgba(230, 0, 35, 0.2);
+    }
+    
+    /* Ajustes para pantallas muy pequeñas */
+    @media (max-width: 400px) {
+        .search {
+            max-width: 150px;
+        }
+        
+        #pinterest-icon {
+            width: 30px;
+            height: 30px;
+        }
+    }
+    
+    .left-itmes.active + .right-items .material-symbols-outlined {
+        margin: 0 12px 0 0;
+        padding: 12px;
+        background: #f5f5f5;
+        border-radius: 50%;
+    }
+    
+    .left-itmes.active + .right-items #logoutBtn {
+        margin-left: auto;
+        color: #e60023;
+        font-weight: bold;
+        background: rgba(230, 0, 35, 0.1);
+    }
+
+    .left-itmes .first {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .left-itmes .first li {
+        padding: 12px 0;
+        width: 100%;
+    }
+
+    .left-itmes .first li a {
+        display: block;
+        padding: 8px 0;
+    }
+
+    .search {
+        margin: 0 8px;
+        flex-grow: 1;
+    }
+
+    .right-items {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+    }
+}
+
+.right-items .material-symbols-outlined {
+    padding: 8px;
+    margin: 0 4px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.right-items .material-symbols-outlined:hover {
+    background-color: #f0f0f0;
+}
+
+#logoutBtn {
+    color: #e60023;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    .right-items .material-symbols-outlined {
+        padding: 8px;
+        margin: 0 2px;
+        font-size: 22px;
+    }
+    
+    #pinterest-icon {
+        width: 30px;
+        height: 27px;
+    }
+    
+    .menu-toggle {
+        padding: 4px;
+        margin-right: 4px;
+    }
 }
 
 header nav img#pinterest-icon {
@@ -121,48 +341,119 @@ header nav img#pinterest-icon:hover {
     border-radius: 150px;
 }
 
-/* Cards */
+/* Layout */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.5;
+    color: #111111;
+    background-color: #f5f5f5;
+}
 
+/* Header */
+header nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    padding: 0 16px;
+    background-color: white;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    z-index: 100;
+}
+
+/* Main Content */
 .contenido {
-    position: absolute;
-    margin-top: 80px;
-    padding-right: 5px;
+    margin-top: 72px;
+    padding: 0 8px;
+    width: 100%;
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
+/* Responsive Grid */
 .imagenes {
-    /* display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: top; */
-
-    /* display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr; */
-
-    columns: 5 240px;
-    margin: auto;
-
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    padding: 16px;
+    width: 100%;
+    max-width: 1800px;
+    margin: 0 auto;
 }
 
+@media (max-width: 1200px) {
+    .imagenes {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .imagenes {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 8px;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .imagenes {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        padding: 6px;
+    }
+}
+
+/* Image Cards */
 .imagenes .card-image {
     position: relative;
-    padding: 6px;
+    margin-bottom: 16px;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1/1.3; /* Proporción común para imágenes de Pinterest */
+}
+
+.imagenes .card-image:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .imagenes .card-image img {
-    border-radius: 8%;
-    min-width: 240px;
-    max-width: 240px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 12px;
+    transition: transform 0.3s ease-in-out;
+    background: white;
 }
 
+.imagenes .card-image:hover img {
+    transform: scale(1.02);
+}
 
 .card-image:hover > :first-child {
-    filter: brightness(60%);
+    filter: brightness(0.9);
 }
 
 .card-image:hover > * {
     visibility: visible;
-    display: inline;
+    opacity: 1;
+    transition: all 0.3s ease-in-out;
 }
 
 .button {
