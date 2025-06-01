@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login y Registro - GyroZeppeli</title>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login y Registro - Pinterest</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
   <main>
@@ -49,52 +46,46 @@
     </div>
   </main>
 
-  <script>
-    // Toggle entre Login y Registro
-    const cont = document.getElementById("contenedor");
-    document.getElementById("btn__registrarse")
-      .addEventListener("click", () => cont.style.left = "50%");
-    document.getElementById("btn__iniciar-sesion")
-      .addEventListener("click", () => cont.style.left = "0");
+    <script src="assets/js/script.js"></script>
+    <script>
+        // LOGIN
+        document.getElementById("loginForm")
+            .addEventListener("submit", async e => {
+                e.preventDefault();
+                const data = Object.fromEntries(new FormData(e.target));
+                const res = await fetch("/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    localStorage.setItem("userId", result.user.id);
+                    window.location.href = "/home.html";
+                } else {
+                    alert("Error: " + result.message);
+                }
+            });
 
-    // LOGIN
-    document.getElementById("loginForm")
-      .addEventListener("submit", async e => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(e.target));
-        const res  = await fetch("/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        if (result.success) {
-          localStorage.setItem("userId", result.user.id);
-          window.location.href = "/home.html";
-        } else {
-          alert("Error: " + result.message);
-        }
-      });
-
-    // REGISTER
-    document.getElementById("registerForm")
-      .addEventListener("submit", async e => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(e.target));
-        const res  = await fetch("/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        if (result.success) {
-          alert("Usuario creado. Ahora inicia sesión.");
-          // Volvemos al login
-          cont.style.left = "0";
-        } else {
-          alert("Error: " + result.message);
-        }
-      });
-  </script>
+        // REGISTER
+        document.getElementById("registerForm")
+            .addEventListener("submit", async e => {
+                e.preventDefault();
+                const data = Object.fromEntries(new FormData(e.target));
+                const res = await fetch("/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert("Usuario creado. Ahora inicia sesión.");
+                    // Volvemos al login
+                    document.querySelector('.contenedor__login-register').style.left = "0";
+                } else {
+                    alert("Error: " + result.message);
+                }
+            });
+    </script>
 </body>
 </html>
