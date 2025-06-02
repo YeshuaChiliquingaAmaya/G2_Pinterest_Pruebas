@@ -121,7 +121,6 @@ const server = http.createServer(async (req, res) => {
   }
 
 
-  // 4) POST /upload?user_id=…  ← aquí viene el cambio
   // 4) Subida de imagen: POST /upload?user_id=…
 if (req.method === "POST" && pathname === "/upload") {
     console.log("→ Handler /upload invocado");

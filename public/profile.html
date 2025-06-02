@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Perfil de Usuario</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #fafafa;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .perfil-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      overflow: hidden;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      transition: 0.3s ease;
+    }
+
+    .foto-perfil {
+      width: 100%;
+      height: 250px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .contenido {
+      padding: 20px;
+    }
+
+    .contenido h2 {
+      font-size: 24px;
+      color: #333;
+    }
+
+    .contenido p {
+      margin-top: 8px;
+      color: #555;
+    }
+
+    .boton-editar {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 10px 20px;
+      background: #e60023;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: 0.3s ease;
+    }
+
+    .boton-editar:hover {
+      background: #c1001a;
+    }
+
+    .sin-sesion {
+      color: red;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="perfil-container" id="perfil">
+    <!-- Se llena desde JavaScript -->
+  </div>
+  <div id="gallery" class="contenedor__todos"></div>
+  <a href="/index.html">Volver al Home</a>
+
+  <script>
+    async function loadOwn() {
+      const uid = localStorage.getItem("userId");
+      if (!uid) return alert("Debes iniciar sesión antes");
+      const res = await fetch("/api/images?user_id="+uid);
+      const imgs = await res.json();
+      const g    = document.getElementById("gallery");
+      imgs.forEach(i => {
+        const img = document.createElement("img");
+        img.src   = i.url;
+        img.width = 200;
+        g.appendChild(img);
+      });
+    }
+    window.addEventListener("DOMContentLoaded", loadOwn);
+  </script>
+
+</body>
+</html>
