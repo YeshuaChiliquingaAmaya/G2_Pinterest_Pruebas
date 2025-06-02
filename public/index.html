@@ -150,7 +150,7 @@
         </div>
     </div>
 
-    <script>
+    <script> 
         // Elementos del DOM
         const authContainer = document.getElementById('authContainer');
         const pinterestContent = document.getElementById('pinterestContent');
@@ -329,6 +329,33 @@
             localStorage.removeItem('userId');
             checkAuth();
         });
+
+        function checkAuth() {
+    const userId = localStorage.getItem('userId');
+    const userName = localStorage.getItem('userName');
+
+    if (userId) {
+        authContainer.style.display = 'none';
+        pinterestContent.style.display = 'block';
+
+        // Mostrar saludo con nombre
+        const userGreeting = document.getElementById('userGreeting');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        if(userGreeting && userNameDisplay) {
+            userNameDisplay.textContent = userName || 'Usuario';
+            userGreeting.style.display = 'block';
+        }
+
+        loadImages();
+    } else {
+        authContainer.style.display = 'flex';
+        pinterestContent.style.display = 'none';
+
+        // Ocultar saludo si no hay sesión
+        const userGreeting = document.getElementById('userGreeting');
+        if(userGreeting) userGreeting.style.display = 'none';
+    }
+}
 
         // Inicializar la aplicación
         checkAuth();

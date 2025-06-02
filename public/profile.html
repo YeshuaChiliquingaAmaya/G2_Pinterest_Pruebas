@@ -3,98 +3,184 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Perfil de Usuario</title>
+  <title>Perfil de Usuario - Estilo Pinterest</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
+  * {
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
-    body {
-      background: #fafafa;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
+body {
+  background: linear-gradient(to right, #fffafc, #ffe6ec);
+  color: #111;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 16px;
+}
 
-    .perfil-container {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      overflow: hidden;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      transition: 0.3s ease;
-    }
+.perfil-container {
+  width: 100%;
+  max-width: 800px;
+  background-color: #fff;
+  padding: 30px 20px;
+  border-radius: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  margin-bottom: 40px;
+  text-align: center;
+  animation: fadeIn 0.7s ease-in-out;
+}
 
-    .foto-perfil {
-      width: 100%;
-      height: 250px;
-      background-size: cover;
-      background-position: center;
-    }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    .contenido {
-      padding: 20px;
-    }
+.foto-perfil {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background-color: #eee;
+  background-size: cover;
+  background-position: center;
+  border: 5px solid white;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  margin: 0 auto 15px;
+  transition: transform 0.3s ease;
+}
 
-    .contenido h2 {
-      font-size: 24px;
-      color: #333;
-    }
+.foto-perfil:hover {
+  transform: scale(1.05);
+}
 
-    .contenido p {
-      margin-top: 8px;
-      color: #555;
-    }
+.contenido h2 {
+  font-size: 26px;
+  font-weight: 600;
+  color: #333;
+}
 
-    .boton-editar {
-      display: inline-block;
-      margin-top: 16px;
-      padding: 10px 20px;
-      background: #e60023;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: 0.3s ease;
-    }
+.contenido p {
+  font-size: 16px;
+  color: #777;
+  margin-top: 4px;
+}
 
-    .boton-editar:hover {
-      background: #c1001a;
-    }
+.volver {
+  display: inline-block;
+  margin-top: 16px;
+  font-weight: 500;
+  background-color: #e60023;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: background 0.3s;
+}
 
-    .sin-sesion {
-      color: red;
-      text-align: center;
-    }
+.volver:hover {
+  background-color: #b8001c;
+}
+
+/* GALERÍA CON GRID */
+#gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 1200px;
+  animation: fadeIn 0.5s ease-in-out;
+  justify-items: center;
+}
+
+#gallery img {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+#gallery img:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  #gallery {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  #gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .perfil-container {
+    padding: 10px 10px;
+  }
+
+  .volver {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  #gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .foto-perfil {
+    width: 100px;
+    height: 100px;
+  }
+
+  .contenido h2 {
+    font-size: 20px;
+  }
+}
   </style>
 </head>
 <body>
 
-  <div class="perfil-container" id="perfil">
-    <!-- Se llena desde JavaScript -->
+  <div class="perfil-container">
+    <div class="foto-perfil" id="foto-perfil"></div>
+    <div class="contenido">
+      <h2 id="nombre-usuario">Cargando...</h2>
+      <p id="email-usuario">Cargando...</p>
+
+      <div id="gallery"></div>
+
+      <a class="volver" href="/index.html">← Volver al Home</a>
+    </div>
   </div>
-  <div id="gallery" class="contenedor__todos"></div>
-  <a href="/index.html">Volver al Home</a>
+
+
 
   <script>
     async function loadOwn() {
       const uid = localStorage.getItem("userId");
       if (!uid) return alert("Debes iniciar sesión antes");
-      const res = await fetch("/api/images?user_id="+uid);
+
+      // Simula datos de usuario (puedes reemplazarlo con valores de tu backend)
+      document.getElementById("nombre-usuario").textContent = "Juan Pérez";
+      document.getElementById("email-usuario").textContent = "juanperez@example.com";
+      document.getElementById("foto-perfil").style.backgroundImage = "url('https://i.pravatar.cc/150?img=3')";
+
+      const res = await fetch("/api/images?user_id=" + uid);
       const imgs = await res.json();
-      const g    = document.getElementById("gallery");
+      const g = document.getElementById("gallery");
+
       imgs.forEach(i => {
         const img = document.createElement("img");
-        img.src   = i.url;
-        img.width = 200;
+        img.src = i.url;
         g.appendChild(img);
       });
     }
