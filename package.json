@@ -9,11 +9,8 @@
   "scripts": {
     "test": "jest",
     "start": "node start.js",
-<<<<<<< HEAD
-    "jest": "jest --coverage"
-=======
+    "jest": "jest --coverage",
     "lint": "eslint ."
->>>>>>> 76e5affcc5308d77a8ab47ccfb837f2411b3a365
   },
   "keywords": [],
   "author": "",

@@ -77,16 +77,15 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(201, {'Content-Type':'application/json'});
         return res.end(JSON.stringify({ success:true, message:'Usuario creado' }));
       } catch (err) {
-<<<<<<< HEAD
-        console.error("Error /register:", err);
-        const msg = err.code === "ER_DUP_ENTRY" ? "Correo o usuario ya existe" : "Error interno";
-        res.writeHead(409 , {"Content-Type":"application/json"});
-=======
         console.error('Error /register:', err);
-        const msg = err.code === 'ER_DUP_ENTRY' ? 'Correo o usuario ya existe' : 'Error interno';
-        res.writeHead(500, {'Content-Type':'application/json'});
->>>>>>> 76e5affcc5308d77a8ab47ccfb837f2411b3a365
-        return res.end(JSON.stringify({ success:false, message: msg }));
+      // Si el error es por clave duplicada, respondemos 409 Conflict, sino 500 error interno
+      if (err.code === 'ER_DUP_ENTRY') {
+        res.writeHead(409, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: false, message: 'Correo o usuario ya existe' }));
+      } else {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: false, message: 'Error interno' }));
+      }
       }
     });
   }
