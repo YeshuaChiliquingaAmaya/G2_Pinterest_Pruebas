@@ -257,8 +257,11 @@ header nav img#pinterest-icon:hover {
     border-radius: 150px;
 }
 
-.first{
+.first {
     display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
 }
 
 .first a {
@@ -268,14 +271,24 @@ header nav img#pinterest-icon:hover {
 
 .first li {
     list-style: none;
-    padding: 0px 12px;
+    margin: 0 8px;
 }
 
-.first li #inicio {
+/* Estilos para los botones de navegación */
+.first li a {
+    display: block;
+    padding: 10px 16px;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: #111111;
+}
+
+.first li a.active,
+.first li a:hover {
     background-color: #111111;
     color: white;
-    border-radius: 25px;
-    padding: 14px 12px 14px;
 }
 
 
@@ -500,6 +513,291 @@ header nav {
 }
 
 /* Encabezado del perfil */
+/* Notificaciones estilo Pinterest */
+.notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 16px;
+    color: #111;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1100;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: slideIn 0.3s ease-out forwards;
+    display: flex;
+    align-items: center;
+    max-width: 300px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.notification::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 15px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+}
+
+.notification.success {
+    background: rgba(255, 255, 255, 0.95);
+    color: #1a8917;
+}
+
+.notification.error {
+    background: rgba(255, 255, 255, 0.95);
+    color: #e60023;
+}
+
+.notification.warning {
+    background: rgba(255, 255, 255, 0.95);
+    color: #e6a700;
+}
+
+.notification.info {
+    background: rgba(255, 255, 255, 0.95);
+    color: #0d66e5;
+}
+
+.notification .material-symbols-outlined {
+    margin-right: 12px;
+    font-size: 22px;
+    font-variation-settings: 'FILL' 1;
+}
+
+/* Iconos específicos para cada tipo de notificación */
+.notification.success .material-symbols-outlined {
+    color: #1a8917;
+}
+
+.notification.error .material-symbols-outlined {
+    color: #e60023;
+}
+
+.notification.warning .material-symbols-outlined {
+    color: #e6a700;
+}
+
+.notification.info .material-symbols-outlined {
+    color: #0d66e5;
+}
+
+/* Efecto hover sutil */
+.notification:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Estilos para el mensaje de sin resultados */
+.no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    color: #111;
+}
+
+.no-results .material-symbols-outlined {
+    font-size: 64px;
+    color: #e1e1e1;
+    margin-bottom: 20px;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
+}
+
+.no-results h3 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #111;
+}
+
+.no-results p {
+    font-size: 16px;
+    color: #767676;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.no-results .btn-primary {
+    background-color: #e60023;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.no-results .btn-primary:hover {
+    background-color: #ad081b;
+}
+
+.no-results .btn-primary .material-symbols-outlined {
+    font-size: 20px;
+    margin-right: 8px;
+    color: white;
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Visor de Imagen a Pantalla Completa */
+.image-viewer {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    overflow: auto;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 60px 0;
+    box-sizing: border-box;
+}
+
+.image-viewer.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+}
+
+.image-viewer .close-btn {
+    position: fixed;
+    top: 20px;
+    right: 30px;
+    color: #fff;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 2001;
+    background: rgba(0, 0, 0, 0.5);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.image-viewer .close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.image-container {
+    max-width: 90%;
+    max-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+#expandedImg {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.image-details {
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+    box-sizing: border-box;
+    color: white;
+}
+
+.image-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 24px;
+    padding: 8px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.action-btn .material-symbols-outlined {
+    font-size: 20px;
+}
+
+/* Efecto de zoom al pasar el ratón sobre la imagen */
+#expandedImg.zoomable {
+    cursor: zoom-in;
+    transition: transform 0.3s ease;
+}
+
+#expandedImg.zoomable.zoomed {
+    transform: scale(1.5);
+    cursor: zoom-out;
+}
+
+/* Estilos para el botón activo en la navegación */
+#mainNav a.active {
+    color: #E60023;
+    border-bottom: 3px solid #E60023;
+    padding-bottom: 5px;
+}
+
 .profile-header {
     display: flex;
     flex-direction: column;

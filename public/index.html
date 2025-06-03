@@ -105,18 +105,8 @@
                 </a>
                 <div class="left-itmes" id="mainNav">
                     <ul class="first">
-                        <li><a href="#" id="inicio">Inicio</a></li>
+                        <li><a href="#" id="inicio" class="active">Inicio</a></li>
                         <li><a href="#" id="hoy">Hoy</a></li>
-                        <li>
-                            <div class="crear">
-                                <a href="#">Crear</a>
-                                <span class="material-symbols-outlined">expand_more</span>
-                                <ul class="menu">
-                                    <li>Crear un Idea Pin</li>
-                                    <li>Crear Pin</li>
-                                </ul>
-                            </div>
-                        </li>
                     </ul>
                 </div>
                 <div class="search">
@@ -126,9 +116,7 @@
                     </div>
                 </div>
                 <div class="right-items">
-                    <span class="material-symbols-outlined" id="notifications">notifications</span>
-                    <span class="material-symbols-outlined" id="message">sms</span>
-                    <a href="/profile.html"><span class="material-symbols-outlined" id="profile-img">account_circle</span></a>
+                    <a href="/profile.html" class="profile-link"><span class="material-symbols-outlined" id="profile-img">account_circle</span></a>
                     <span class="material-symbols-outlined" id="logoutBtn">logout</span>
                 </div>
             </nav>
@@ -185,53 +173,143 @@
         const imageGrid = document.getElementById('imageGrid');
         const logoutBtn = document.getElementById('logoutBtn');
 
+        // Mostrar notificación con estilo Pinterest
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            // Mapeo de tipos a iconos de Material Icons
+            const icons = {
+                success: 'check_circle',
+                error: 'error',
+                warning: 'warning',
+                info: 'info'
+            };
+            
+            // Crear contenido de la notificación
+            notification.innerHTML = `
+                <span class="material-symbols-outlined">${icons[type] || 'notifications'}</span>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Desaparecer después de 4 segundos con animación
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-30px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+            
+            // Cerrar al hacer clic
+            notification.addEventListener('click', () => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-30px)';
+                setTimeout(() => notification.remove(), 300);
+            });
+        }
+
         // Verificar si el usuario ya está autenticado
         function checkAuth() {
             const userId = localStorage.getItem('userId');
             if (userId) {
                 authContainer.style.display = 'none';
                 pinterestContent.style.display = 'block';
+                // Establecer el botón Inicio como activo por defecto
+                setActiveButton('inicio');
                 loadImages();
             } else {
                 authContainer.style.display = 'flex';
                 pinterestContent.style.display = 'none';
             }
         }
+        // Función para mostrar mensaje de sin resultados
+        function showNoResultsMessage(searchQuery) {
+            imageGrid.innerHTML = `
+                <div class="no-results">
+                    <span class="material-symbols-outlined">search_off</span>
+                    <h3>No se encontraron resultados para "${searchQuery}"</h3>
+                    <p>Prueba con palabras clave diferentes o verifica la ortografía.</p>
+                    <button class="btn-primary" onclick="setActiveButton('inicio'); loadImages();">Ver todos los Pins</button>
+                </div>
+            `;
+        }
+
         // Evento para buscar imágenes al presionar Enter en la barra de búsqueda
         baraBusqueda.addEventListener('keydown', async (event) => {
             if (event.key === 'Enter') {
-                event.preventDefault(); // evita que se haga un submit si está en un formulario
+                event.preventDefault();
                 const query = baraBusqueda.value.trim();
                 if (query) {
-                try {
-                    const response = await fetch(`/api/search?user=${encodeURIComponent(query)}`);
-                    const images = await response.json();
+                    try {
+                        const response = await fetch(`/api/search?user=${encodeURIComponent(query)}`);
+                        const images = await response.json();
 
-                    imageGrid.innerHTML = ''; // Limpiar contenedor
+                        imageGrid.innerHTML = ''; // Limpiar contenedor
 
-                    images.forEach(img => {
-                    const imageCard = document.createElement('div');
-                    imageCard.className = 'card-image';
-                    imageCard.innerHTML = `
-                        <img src="${img.url}" alt="Imagen" class="img">
-                        <button class="button">Guardar</button>
-                        <span class="material-symbols-outlined oculto-1">upload</span>
-                        <span class="material-symbols-outlined oculto-2">more_horiz</span>
-                    `;
-                    imageGrid.appendChild(imageCard);
-                    });
-                } catch (error) {
-                    console.error('Error al buscar imágenes:', error);
-                }
+                        if (images.length === 0) {
+                            showNoResultsMessage(query);
+                        } else {
+                            images.forEach(img => {
+                                const imageCard = document.createElement('div');
+                                imageCard.className = 'card-image';
+                                imageCard.innerHTML = `
+                                    <img src="${img.url}" alt="Imagen" class="img">
+                                    <button class="button">Guardar</button>
+                                    <span class="material-symbols-outlined oculto-1">upload</span>
+                                    <span class="material-symbols-outlined oculto-2">more_horiz</span>
+                                `;
+                                imageGrid.appendChild(imageCard);
+                            });
+                            
+                            // Mostrar notificación con la cantidad de resultados
+                            showNotification(`Se encontraron ${images.length} resultados`, 'info');
+                        }
+                    } catch (error) {
+                        console.error('Error al buscar imágenes:', error);
+                        showNotification('Error al realizar la búsqueda', 'error');
+                    }
                 } else {
                 loadImages(); // Si el campo está vacío, recarga imágenes generales
                 }
             }
         });
 
-        //Carga de imagenes que se subieron el dia de hoy 
-       document.getElementById('hoy').addEventListener('click', async (event) => {
-            event.preventDefault(); // Evita que el enlace recargue la página
+        // Función para establecer el botón activo
+        function setActiveButton(buttonId) {
+            // Remover clase active de todos los botones
+            document.querySelectorAll('#mainNav a').forEach(btn => {
+                btn.classList.remove('active');
+                // Asegurarse de que solo los botones de navegación tengan el estilo activo
+                if (['inicio', 'hoy'].includes(btn.id)) {
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '#111111';
+                }
+            });
+            
+            // Agregar clase active al botón seleccionado
+            const activeButton = document.getElementById(buttonId);
+            if (activeButton) {
+                activeButton.classList.add('active');
+                // Aplicar estilos directamente para garantizar la consistencia
+                activeButton.style.backgroundColor = '#111111';
+                activeButton.style.color = 'white';
+            }
+        }
+
+        // Evento para el botón de inicio
+        document.getElementById('inicio').addEventListener('click', async (event) => {
+            event.preventDefault();
+            setActiveButton('inicio');
+            // Cargar todas las imágenes
+            await loadImages();
+        });
+
+        // Carga de imágenes que se subieron el día de hoy 
+        document.getElementById('hoy').addEventListener('click', async (event) => {
+            event.preventDefault();
+            setActiveButton('hoy');
+            // Cargar imágenes del día actual
             try {
                 const today = new Date().toISOString().slice(0, 10);
                 const response = await fetch(`/api/images/date?date=${today}`);
@@ -282,6 +360,9 @@
                 
                 // Mostrar el botón de subir imagen
                 document.getElementById('uploadContainer').style.display = 'block';
+                
+                // Mostrar notificación de carga exitosa
+                showNotification('Imágenes cargadas correctamente', 'success');
             } catch (error) {
                 console.error('Error al cargar imágenes:', error);
             }
@@ -395,13 +476,15 @@
                     const result = await response.json();
                     
                     if (result.url) {
-                        loadImages(); // Recargar imágenes
+                        // Mostrar notificación de éxito
+                        showNotification('¡Imagen subida exitosamente!', 'success');
+                        loadImages(); // Recargar la galería
                     } else {
-                        alert('Error al subir la imagen');
+                        showNotification('Error al subir la imagen: ' + (result.error || 'Error desconocido'), 'error');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('Error al subir la imagen');
+                    showNotification('Error al subir la imagen: ' + (error.message || 'Error desconocido'), 'error');
                 }
             }
         });
@@ -441,6 +524,127 @@
 
         // Inicializar la aplicación
         checkAuth();
+    
+        // Función para manejar el visor de imágenes
+        function initImageViewer() {
+            const imageViewer = document.getElementById('imageViewer');
+            const expandedImg = document.getElementById('expandedImg');
+            const closeBtn = document.querySelector('.close-btn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const shareBtn = document.getElementById('shareBtn');
+            
+            // Función para abrir el visor
+            function openViewer(imageSrc) {
+                expandedImg.src = imageSrc;
+                expandedImg.classList.add('zoomable');
+                document.body.style.overflow = 'hidden'; // Deshabilitar scroll
+                imageViewer.classList.add('active');
+            }
+            
+            // Función para cerrar el visor
+            function closeViewer() {
+                imageViewer.classList.remove('active');
+                document.body.style.overflow = ''; // Habilitar scroll
+                setTimeout(() => {
+                    expandedImg.src = '';
+                    expandedImg.classList.remove('zoomed');
+                }, 300);
+            }
+            
+            // Cerrar al hacer clic en la X
+            closeBtn.addEventListener('click', closeViewer);
+            
+            // Cerrar al hacer clic fuera de la imagen
+            imageViewer.addEventListener('click', (e) => {
+                if (e.target === imageViewer) {
+                    closeViewer();
+                }
+            });
+            
+            // Cerrar con la tecla ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && imageViewer.classList.contains('active')) {
+                    closeViewer();
+                }
+            });
+            
+            // Zoom al hacer clic en la imagen
+            expandedImg.addEventListener('click', (e) => {
+                e.stopPropagation();
+                expandedImg.classList.toggle('zoomed');
+            });
+            
+            // Descargar imagen
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const link = document.createElement('a');
+                link.href = expandedImg.src;
+                link.download = `pinterest-image-${Date.now()}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showNotification('Descarga iniciada', 'success');
+            });
+            
+            // Compartir (soporte para Web Share API)
+            shareBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                try {
+                    if (navigator.share) {
+                        await navigator.share({
+                            title: 'Imagen de Pinterest',
+                            text: '¡Mira esta imagen que encontré en Pinterest!',
+                            url: expandedImg.src
+                        });
+                    } else {
+                        // Fallback para navegadores sin soporte para share
+                        await navigator.clipboard.writeText(expandedImg.src);
+                        showNotification('Enlace copiado al portapapeles', 'info');
+                    }
+                } catch (err) {
+                    console.error('Error al compartir:', err);
+                    showNotification('No se pudo compartir la imagen', 'error');
+                }
+            });
+            
+            // Hacer que todas las imágenes de la galería sean clickeables
+            document.addEventListener('click', (e) => {
+                // Verificar si el clic fue en una imagen de la galería
+                const cardImage = e.target.closest('.card-image img');
+                if (cardImage) {
+                    e.preventDefault();
+                    openViewer(cardImage.src);
+                }
+            });
+            
+            // Deshabilitar el menú contextual en la imagen ampliada
+            expandedImg.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+            });
+        }
+        
+        // Inicializar el visor de imágenes cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            initImageViewer();
+        });
     </script>
+    
+    <!-- Visor de Imagen a Pantalla Completa -->
+    <div id="imageViewer" class="image-viewer">
+        <span class="close-btn material-symbols-outlined">close</span>
+        <div class="image-container">
+            <img src="" alt="Imagen ampliada" id="expandedImg">
+        </div>
+        <div class="image-details">
+            <div class="image-actions">
+                <button class="action-btn" id="downloadBtn" title="Descargar">
+                    <span class="material-symbols-outlined">file_download</span>
+                </button>
+                <button class="action-btn" id="shareBtn" title="Compartir">
+                    <span class="material-symbols-outlined">ios_share</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
