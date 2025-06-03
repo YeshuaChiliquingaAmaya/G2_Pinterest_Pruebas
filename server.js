@@ -93,7 +93,7 @@ const server = http.createServer(async (req, res) => {
       try {
         const { correo, contrasena } = JSON.parse(body);
         const [rows] = await pool.query(
-          `SELECT id, correo, contrasena FROM usuarios WHERE correo = ?`,
+          `SELECT id, correo, contrasena, nombre_completo, usuario FROM usuarios WHERE correo = ?`,
           [correo]
         );
         if (!rows.length) {
@@ -110,7 +110,12 @@ const server = http.createServer(async (req, res) => {
         return res.end(JSON.stringify({
           success: true,
           message: "Ingreso correcto",
-          user:    { id: user.id, correo: user.correo }
+          user:    { 
+            id: user.id, 
+            correo: user.correo, 
+            nombre_completo: user.nombre_completo, 
+            usuario: user.usuario 
+          }
         }));
       } catch (err) {
         console.error("Error /login:", err);

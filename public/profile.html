@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Perfil de Usuario - Estilo Pinterest</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <title>Perfil de Usuario - Pinterest</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
   <style>
   * {
   box-sizing: border-box;
@@ -150,41 +152,178 @@ body {
 </head>
 <body>
 
-  <div class="perfil-container">
-    <div class="foto-perfil" id="foto-perfil"></div>
-    <div class="contenido">
-      <h2 id="nombre-usuario">Cargando...</h2>
-      <p id="email-usuario">Cargando...</p>
+  <!-- Navbar -->
+  <header>
+    <nav id="navbar-pinterest">
+      <a href="index.html" class="logo">
+        <img src="images/Pinterest_Icon.png" alt="Pinterest" id="pinterest-icon">
+      </a>
+      <div class="search">
+        <div class="barra">
+          <span class="material-icons" id="lupa">search</span>
+          <input type="text" placeholder="Buscar" class="finder">
+        </div>
+      </div>
+      <div class="right-items">
+        <a href="profile.html" class="profile-link" id="profileLink">
+          <span class="material-icons">account_circle</span>
+        </a>
+        <span class="material-icons" id="logoutBtn">logout</span>
+      </div>
+    </nav>
+  </header>
 
-      <div id="gallery"></div>
-
-      <a class="volver" href="/index.html">← Volver al Home</a>
+  <!-- Contenido del perfil -->
+  <main class="profile-container">
+    <div class="profile-header">
+      <div class="profile-avatar" id="profile-avatar">
+        <span class="material-icons">account_circle</span>
+      </div>
+      <div class="profile-info">
+        <h1 id="profile-username">Cargando...</h1>
+        <div class="profile-stats">
+          <div class="stat">
+            <span id="pins-count">0</span>
+            <span>Pins</span>
+          </div>
+        </div>
+        <p id="profile-email" class="profile-email">@usuario</p>
+      </div>
     </div>
-  </div>
 
+    <div class="profile-tabs">
+      <button class="tab-btn active" data-tab="pins">Tus Pins</button>
+    </div>
 
+    <div class="gallery-container">
+      <div id="gallery" class="gallery-grid">
+        <!-- Las imágenes se cargarán aquí -->
+      </div>
+      <div id="loading" class="loading">Cargando tus Pins...</div>
+      <div id="no-pins" class="no-pins" style="display: none;">
+        <span class="material-icons">photo_library</span>
+        <p>Aún no has subido ningún Pin</p>
+        <a href="index.html" class="btn-primary">Sube tu primer Pin</a>
+      </div>
+    </div>
+  </main>
 
   <script>
-    async function loadOwn() {
-      const uid = localStorage.getItem("userId");
-      if (!uid) return alert("Debes iniciar sesión antes");
+    // Elementos del DOM
+    const gallery = document.getElementById('gallery');
+    const loading = document.getElementById('loading');
+    const noPins = document.getElementById('no-pins');
+    const pinsCount = document.getElementById('pins-count');
+    const profileUsername = document.getElementById('profile-username');
+    const profileEmail = document.getElementById('profile-email');
+    const profileAvatar = document.getElementById('profile-avatar');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-      // Simula datos de usuario (puedes reemplazarlo con valores de tu backend)
-      document.getElementById("nombre-usuario").textContent = "Juan Pérez";
-      document.getElementById("email-usuario").textContent = "juanperez@example.com";
-      document.getElementById("foto-perfil").style.backgroundImage = "url('https://i.pravatar.cc/150?img=3')";
+    // Cerrar sesión
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userName');
+      window.location.href = 'index.html';
+    });
 
-      const res = await fetch("/api/images?user_id=" + uid);
-      const imgs = await res.json();
-      const g = document.getElementById("gallery");
+    // Cargar perfil
+    async function loadProfile() {
+      console.log('Iniciando carga del perfil...');
+      
+      // Obtener elementos del DOM
+      const profileUsername = document.getElementById('profile-username');
+      const profileEmail = document.getElementById('profile-email');
+      
+      // Mostrar todos los elementos del localStorage para depuración
+      console.log('Todo el contenido de localStorage:');
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        console.log(`${key}: ${localStorage.getItem(key)}`);
+      }
+      
+      const userId = localStorage.getItem('userId');
+      let userName = localStorage.getItem('userName');
+      const userEmail = localStorage.getItem('userEmail');
 
-      imgs.forEach(i => {
-        const img = document.createElement("img");
-        img.src = i.url;
-        g.appendChild(img);
+      console.log('Datos del usuario desde localStorage:', { 
+        userId, 
+        userName, 
+        userEmail,
+        'userName type': typeof userName
       });
+
+      if (!userId) {
+        console.log('No hay usuario autenticado, redirigiendo a index.html');
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      // Forzar la actualización del nombre de usuario
+      if (!userName || userName === 'Usuario') {
+        userName = userEmail ? userEmail.split('@')[0] : 'Usuario';
+        console.log('Nombre de usuario actualizado:', userName);
+      }
+      
+      // Actualizar la interfaz de usuario
+      profileUsername.textContent = userName;
+      profileEmail.textContent = `@${userName}`;
+      console.log('Interfaz actualizada con:', { userName });
+
+      // Mostrar datos del usuario
+      console.log('Mostrando datos del usuario:', { userName, userEmail });
+      
+      // Mostrar el nombre de usuario (username)
+      profileUsername.textContent = userName || 'Usuario';
+      
+      // Mostrar el correo sin el dominio
+      const usernameFromEmail = userEmail ? userEmail.split('@')[0] : 'usuario';
+      profileEmail.textContent = `@${usernameFromEmail}`;
+      
+      console.log('Datos mostrados:', { 
+        userName: userName, 
+        usernameFromEmail: usernameFromEmail 
+      });
+
+      try {
+        // Cargar imágenes del usuario
+        const response = await fetch(`/api/images?user_id=${userId}`);
+        const images = await response.json();
+        
+        // Actualizar contador
+        pinsCount.textContent = images.length;
+        
+        // Mostrar mensaje si no hay imágenes
+        if (images.length === 0) {
+          loading.style.display = 'none';
+          noPins.style.display = 'flex';
+          return;
+        }
+        
+        // Mostrar imágenes
+        gallery.innerHTML = images.map(img => `
+          <div class="pin">
+            <img src="${img.url}" alt="Pin" loading="lazy">
+            <div class="pin-actions">
+              <button class="pin-btn save-btn">Guardar</button>
+              <button class="pin-btn">
+                <span class="material-icons">more_horiz</span>
+              </button>
+            </div>
+          </div>
+        `).join('');
+        
+        loading.style.display = 'none';
+      } catch (error) {
+        console.error('Error al cargar el perfil:', error);
+        loading.textContent = 'Error al cargar tus Pins. Intenta de nuevo más tarde.';
+      }
     }
-    window.addEventListener("DOMContentLoaded", loadOwn);
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProfile();
+    });
   </script>
 
 </body>

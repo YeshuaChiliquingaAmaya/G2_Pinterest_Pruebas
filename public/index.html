@@ -252,8 +252,26 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    localStorage.setItem('userId', result.user.id);
-                    checkAuth();
+                    console.log('Inicio de sesión exitoso, datos del usuario:', result.user);
+                    
+                    // Asegurarse de que el nombre de usuario no esté vacío
+                    const username = result.user.usuario || 
+                                   result.user.correo?.split('@')[0] || 
+                                   'Usuario';
+                    
+                    // Guardar en localStorage
+                    localStorage.setItem('userId', String(result.user.id));
+                    localStorage.setItem('userName', username);
+                    localStorage.setItem('userEmail', result.user.correo || '');
+                    
+                    console.log('Datos guardados en localStorage:', { 
+                      id: result.user.id, 
+                      userName: username,
+                      userEmail: result.user.correo 
+                    });
+                    
+                    // Forzar recarga para asegurar que los datos se actualicen
+                    window.location.href = 'profile.html';
                 } else {
                     alert('Error: ' + result.message);
                 }
