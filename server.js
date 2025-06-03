@@ -252,79 +252,52 @@ if (req.method === "POST" && pathname === "/upload") {
     }
   }
 
-  // ─── 6) API: Eliminar imagen ────────────────────────────────────────────────
-  if (req.method === "DELETE" && pathname.startsWith("/api/images/")) {
-    console.log('\n=== SOLICITUD DELETE RECIBIDA ===');
-    console.log('URL completa:', req.url);
-    console.log('Pathname:', pathname);
-    
+    // ----- 6) Obtener imagenes por nombre de usuario: GET /api/search?user=…
+  if (req.method === "GET" && pathname === "/api/search") {
     try {
-      // Extraer el ID de la imagen de la URL
-      const imageId = pathname.split('/').pop();
-      const userId = urlObj.searchParams.get("user_id");
-      
-      console.log('Datos extraídos:', { imageId, userId });
-      
-      // Validar parámetros
-      if (!/^\d+$/.test(imageId)) {
-        res.writeHead(400, {"Content-Type": "application/json"});
-        return res.end(JSON.stringify({
-          success: false,
-          message: "ID de imagen no válido"
-        }));
+      const user = urlObj.searchParams.get("user");
+      if (!user) {
+        res.writeHead(400, {"Content-Type":"application/json"});
+        return res.end(JSON.stringify({ error:"Falta parámetro user" }));
       }
-      
-      if (!userId) {
-        res.writeHead(401, {"Content-Type": "application/json"});
-        return res.end(JSON.stringify({
-          success: false,
-          message: "Se requiere user_id"
-        }));
-      }
-      
-      // Verificar que la imagen existe y pertenece al usuario
-      const [image] = await pool.query(
-        "SELECT id FROM imagenes WHERE id = ? AND user_id = ?",
-        [imageId, userId]
+      const [rows] = await pool.query(
+        `SELECT i.* FROM imagenes i
+         JOIN usuarios u ON i.user_id = u.id
+         WHERE u.usuario = ?`,
+        [user]
       );
-      
-      if (image.length === 0) {
-        res.writeHead(404, {"Content-Type": "application/json"});
-        return res.end(JSON.stringify({
-          success: false,
-          message: "Imagen no encontrada"
-        }));
-      }
-      
-      // Eliminar la imagen
-      await pool.query("DELETE FROM imagenes WHERE id = ?", [imageId]);
-      
-      // Respuesta exitosa
-      res.writeHead(200, {"Content-Type": "application/json"});
-      res.end(JSON.stringify({
-        success: true,
-        message: "Imagen eliminada correctamente"
-      }));
-      return;
-      
-    } catch (error) {
-      console.error("Error en API eliminar imagen:", error);
-      res.writeHead(500, {"Content-Type": "application/json"});
-      res.end(JSON.stringify({
-        success: false,
-        message: "Error interno del servidor"
-      }));
-      return;
+      res.writeHead(200, {"Content-Type":"application/json"});
+      return res.end(JSON.stringify(rows));
+    } catch (err) {
+      console.error("Error /api/search:", err);
+      res.writeHead(500, {"Content-Type":"application/json"});
+      return res.end(JSON.stringify({ error:"Error servidor" }));
     }
   }
 
+  // --- 7) objetener imagenes por fecha: GET /api/images?date=…
+  if (req.method === "GET" && pathname === "/api/images/date") {
+    try {
+      const date = urlObj.searchParams.get("date");
+      if (!date) {
+        res.writeHead(400, {"Content-Type":"application/json"});
+        return res.end(JSON.stringify({ error:"Falta parámetro date" }));
+      }
+      const [rows] = await pool.query(
+        `SELECT * FROM imagenes WHERE DATE(uploaded_at) = ?`,
+        [date]
+      );
+      res.writeHead(200, {"Content-Type":"application/json"});
+      return res.end(JSON.stringify(rows));
+    } catch (err) {
+      console.error("Error /api/images/date:", err);
+      res.writeHead(500, {"Content-Type":"application/json"});
+      return res.end(JSON.stringify({ error:"Error servidor" }));
+    }
+  }
+
+
   // ─── 7) Cualquier otra ruta → 404 ────────────────────────────────────────────
-  console.log('\n=== RUTA NO ENCONTRADA ===');
-  console.log('Método:', req.method);
-  console.log('URL:', req.url);
-  console.log('Pathname:', pathname);
-  console.log('---------------------------\n');
-  
   res.writeHead(404, {"Content-Type":"application/json"});
   res.end(JSON.stringify({ 
     error: "Ruta no encontrada",
