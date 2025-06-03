@@ -46,7 +46,7 @@ const server = http.createServer(async (req, res) => {
   let   pathname = urlObj.pathname;
 
   // ─── 1) Sirve archivos estáticos de /public ────────────────────────────────
-  if (req.method === "GET") {
+  if (req.method === "GET" && !pathname.startsWith("/api/")) {
     if (pathname === "/") pathname = "/index.html";
     const fp = path.join(__dirname, "public", pathname);
     if (fs.existsSync(fp) && fs.statSync(fp).isFile()) {
@@ -183,7 +183,56 @@ if (req.method === "POST" && pathname === "/upload") {
   }
   
 
-  // ─── 5) Obtener galería: GET /api/images?user_id=… ──────────────────────────
+  // ─── 5) Eliminar imagen: DELETE /api/images/:id ──────────────────────────────
+  if (req.method === "DELETE" && pathname.includes("/api/images/")) {
+    console.log('\n=== SOLICITUD DELETE RECIBIDA ===');
+    console.log('URL completa:', req.url);
+    console.log('Pathname:', pathname);
+    
+    try {
+      // Extraer el ID de la imagen de la URL
+      const imageId = pathname.split('/').pop();
+      const userId = urlObj.searchParams.get("user_id");
+      
+      console.log('Datos extraídos:', { imageId, userId });
+      
+      if (!userId) {
+        console.log('Error: Usuario no autenticado');
+        res.writeHead(401, {"Content-Type": "application/json"});
+        return res.end(JSON.stringify({success: false, message: "Usuario no autenticado"}));
+      }
+      
+      // Verificar que la imagen pertenece al usuario
+      const [check] = await pool.query(
+        "SELECT id FROM imagenes WHERE id = ? AND user_id = ?",
+        [imageId, userId]
+      );
+      
+      if (check.length === 0) {
+        res.writeHead(404, {"Content-Type": "application/json"});
+        return res.end(JSON.stringify({success: false, message: "Imagen no encontrada o no tienes permisos"}));
+      }
+      
+      // Eliminar la imagen de la base de datos
+      await pool.query("DELETE FROM imagenes WHERE id = ?", [imageId]);
+      
+      res.writeHead(200, {"Content-Type": "application/json"});
+      res.end(JSON.stringify({success: true, message: "Imagen eliminada correctamente"}));
+      
+    } catch (error) {
+      console.error("Error al eliminar la imagen:", error);
+      res.writeHead(500, {"Content-Type": "application/json"});
+      res.end(JSON.stringify({success: false, message: "Error al eliminar la imagen"}));
+    }
+    return;
+  }
+
+  // ─── 6) Obtener galería: GET /api/images?user_id=… ──────────────────────────
+  console.log('\n=== MANEJANDO RUTA ===');
+  console.log('Método:', req.method);
+  console.log('Pathname:', pathname);
+  console.log('URL completa:', req.url);
+  
   if (req.method === "GET" && pathname === "/api/images") {
     try {
       const uid    = urlObj.searchParams.get("user_id");
@@ -203,11 +252,89 @@ if (req.method === "POST" && pathname === "/upload") {
     }
   }
 
-  // ─── 6) Cualquier otra ruta → 404 ────────────────────────────────────────────
+  // ─── 6) API: Eliminar imagen ────────────────────────────────────────────────
+  if (req.method === "DELETE" && pathname.startsWith("/api/images/")) {
+    console.log('\n=== SOLICITUD DELETE RECIBIDA ===');
+    console.log('URL completa:', req.url);
+    console.log('Pathname:', pathname);
+    
+    try {
+      // Extraer el ID de la imagen de la URL
+      const imageId = pathname.split('/').pop();
+      const userId = urlObj.searchParams.get("user_id");
+      
+      console.log('Datos extraídos:', { imageId, userId });
+      
+      // Validar parámetros
+      if (!/^\d+$/.test(imageId)) {
+        res.writeHead(400, {"Content-Type": "application/json"});
+        return res.end(JSON.stringify({
+          success: false,
+          message: "ID de imagen no válido"
+        }));
+      }
+      
+      if (!userId) {
+        res.writeHead(401, {"Content-Type": "application/json"});
+        return res.end(JSON.stringify({
+          success: false,
+          message: "Se requiere user_id"
+        }));
+      }
+      
+      // Verificar que la imagen existe y pertenece al usuario
+      const [image] = await pool.query(
+        "SELECT id FROM imagenes WHERE id = ? AND user_id = ?",
+        [imageId, userId]
+      );
+      
+      if (image.length === 0) {
+        res.writeHead(404, {"Content-Type": "application/json"});
+        return res.end(JSON.stringify({
+          success: false,
+          message: "Imagen no encontrada"
+        }));
+      }
+      
+      // Eliminar la imagen
+      await pool.query("DELETE FROM imagenes WHERE id = ?", [imageId]);
+      
+      // Respuesta exitosa
+      res.writeHead(200, {"Content-Type": "application/json"});
+      res.end(JSON.stringify({
+        success: true,
+        message: "Imagen eliminada correctamente"
+      }));
+      return;
+      
+    } catch (error) {
+      console.error("Error en API eliminar imagen:", error);
+      res.writeHead(500, {"Content-Type": "application/json"});
+      res.end(JSON.stringify({
+        success: false,
+        message: "Error interno del servidor"
+      }));
+      return;
+    }
+  }
+
+  // ─── 7) Cualquier otra ruta → 404 ────────────────────────────────────────────
+  console.log('\n=== RUTA NO ENCONTRADA ===');
+  console.log('Método:', req.method);
+  console.log('URL:', req.url);
+  console.log('Pathname:', pathname);
+  console.log('---------------------------\n');
+  
   res.writeHead(404, {"Content-Type":"application/json"});
-  res.end(JSON.stringify({ error:"Ruta no encontrada" }));
+  res.end(JSON.stringify({ 
+    error: "Ruta no encontrada",
+    method: req.method,
+    url: req.url,
+    pathname: pathname
+  }));
 });
 
 server.listen(3000, () =>
   console.log("Servidor corriendo en http://localhost:3000")
 );
+

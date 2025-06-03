@@ -8,6 +8,64 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
+  /* Estilos para el botón de eliminar */
+  .delete-btn {
+    background-color: #ff4d4d !important;
+    color: white !important;
+    transition: background-color 0.2s;
+  }
+  
+  .delete-btn:hover {
+    background-color: #ff1a1a !important;
+    transform: scale(1.1);
+  }
+  
+  /* Estilos para los pines */
+  .pin {
+    position: relative;
+    margin-bottom: 15px;
+    transition: transform 0.2s;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .pin:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .pin-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+  }
+  
+  .pin-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .pin-btn:hover {
+    background: #fff;
+    transform: scale(1.1);
+  }
+  
+  .pin-btn .material-icons {
+    font-size: 18px;
+  }
+  
   * {
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
@@ -302,16 +360,67 @@ body {
         
         // Mostrar imágenes
         gallery.innerHTML = images.map(img => `
-          <div class="pin">
+          <div class="pin" data-image-id="${img.id}">
             <img src="${img.url}" alt="Pin" loading="lazy">
             <div class="pin-actions">
-              <button class="pin-btn save-btn">Guardar</button>
+              <button class="pin-btn delete-btn" data-image-id="${img.id}">
+                <span class="material-icons">delete</span>
+              </button>
               <button class="pin-btn">
                 <span class="material-icons">more_horiz</span>
               </button>
             </div>
           </div>
         `).join('');
+        
+        // Agregar manejadores de eventos para los botones de eliminar
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const imageId = btn.getAttribute('data-image-id');
+            const userId = localStorage.getItem('userId');
+            
+            if (!userId) {
+              alert('Debes iniciar sesión para eliminar imágenes');
+              window.location.href = 'index.html';
+              return;
+            }
+            
+            if (confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
+              try {
+                console.log('Intentando eliminar imagen:', imageId, 'para usuario:', userId);
+                const response = await fetch(`/api/images/${imageId}?user_id=${userId}`, {
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
+                console.log('Respuesta del servidor:', response.status, response.statusText);
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                  // Eliminar el elemento del DOM
+                  btn.closest('.pin').remove();
+                  // Actualizar el contador
+                  const currentCount = parseInt(pinsCount.textContent) - 1;
+                  pinsCount.textContent = currentCount;
+                  
+                  // Mostrar mensaje si no hay más imágenes
+                  if (currentCount === 0) {
+                    gallery.innerHTML = '';
+                    noPins.style.display = 'flex';
+                  }
+                } else {
+                  alert('Error al eliminar la imagen: ' + (result.message || 'Error desconocido'));
+                }
+              } catch (error) {
+                console.error('Error al eliminar la imagen:', error);
+                alert('Error al conectar con el servidor');
+              }
+            }
+          });
+        });
         
         loading.style.display = 'none';
       } catch (error) {
