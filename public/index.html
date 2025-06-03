@@ -122,7 +122,7 @@
                 <div class="search">
                     <div class="barra">
                         <div><span class="material-symbols-outlined" id="lupa">search</span></div>
-                        <input type="text" placeholder="Buscar" class="finder">
+                        <input id="barraBusqueda" type="text" placeholder="Buscar" class="finder">
                     </div>
                 </div>
                 <div class="right-items">
@@ -156,6 +156,8 @@
         const pinterestContent = document.getElementById('pinterestContent');
         const menuToggle = document.getElementById('menuToggle');
         const mainNav = document.getElementById('mainNav');
+        const baraBusqueda = document.getElementById('barraBusqueda');
+        const hoy = document.getElementById('hoy');
         
         // Toggle del menú móvil
         if (menuToggle && mainNav) {
@@ -195,6 +197,68 @@
                 pinterestContent.style.display = 'none';
             }
         }
+        // Evento para buscar imágenes al presionar Enter en la barra de búsqueda
+        baraBusqueda.addEventListener('keydown', async (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // evita que se haga un submit si está en un formulario
+                const query = baraBusqueda.value.trim();
+                if (query) {
+                try {
+                    const response = await fetch(`/api/search?user=${encodeURIComponent(query)}`);
+                    const images = await response.json();
+
+                    imageGrid.innerHTML = ''; // Limpiar contenedor
+
+                    images.forEach(img => {
+                    const imageCard = document.createElement('div');
+                    imageCard.className = 'card-image';
+                    imageCard.innerHTML = `
+                        <img src="${img.url}" alt="Imagen" class="img">
+                        <button class="button">Guardar</button>
+                        <span class="material-symbols-outlined oculto-1">upload</span>
+                        <span class="material-symbols-outlined oculto-2">more_horiz</span>
+                    `;
+                    imageGrid.appendChild(imageCard);
+                    });
+                } catch (error) {
+                    console.error('Error al buscar imágenes:', error);
+                }
+                } else {
+                loadImages(); // Si el campo está vacío, recarga imágenes generales
+                }
+            }
+        });
+
+        //Carga de imagenes que se subieron el dia de hoy 
+       document.getElementById('hoy').addEventListener('click', async (event) => {
+            event.preventDefault(); // Evita que el enlace recargue la página
+            try {
+                const today = new Date().toISOString().slice(0, 10);
+                const response = await fetch(`/api/images/date?date=${today}`);
+
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+
+                const images = await response.json();
+
+                imageGrid.innerHTML = ''; // Limpiar contenedor
+
+                images.forEach(img => {
+                    const imageCard = document.createElement('div');
+                    imageCard.className = 'card-image';
+                    imageCard.innerHTML = `
+                        <img src="${img.url}" alt="Imagen" class="img">
+                        <button class="button">Guardar</button>
+                        <span class="material-symbols-outlined oculto-1">upload</span>
+                        <span class="material-symbols-outlined oculto-2">more_horiz</span>
+                    `;
+                    imageGrid.appendChild(imageCard);
+                });
+            } catch (error) {
+                console.error('Error al cargar imágenes del día:', error);
+            }
+        });
 
         // Cargar imágenes
         async function loadImages() {

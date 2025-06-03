@@ -203,7 +203,52 @@ if (req.method === "POST" && pathname === "/upload") {
     }
   }
 
-  // ─── 6) Cualquier otra ruta → 404 ────────────────────────────────────────────
+    // ----- 6) Obtener imagenes por nombre de usuario: GET /api/search?user=…
+  if (req.method === "GET" && pathname === "/api/search") {
+    try {
+      const user = urlObj.searchParams.get("user");
+      if (!user) {
+        res.writeHead(400, {"Content-Type":"application/json"});
+        return res.end(JSON.stringify({ error:"Falta parámetro user" }));
+      }
+      const [rows] = await pool.query(
+        `SELECT i.* FROM imagenes i
+         JOIN usuarios u ON i.user_id = u.id
+         WHERE u.usuario = ?`,
+        [user]
+      );
+      res.writeHead(200, {"Content-Type":"application/json"});
+      return res.end(JSON.stringify(rows));
+    } catch (err) {
+      console.error("Error /api/search:", err);
+      res.writeHead(500, {"Content-Type":"application/json"});
+      return res.end(JSON.stringify({ error:"Error servidor" }));
+    }
+  }
+
+  // --- 7) objetener imagenes por fecha: GET /api/images?date=…
+  if (req.method === "GET" && pathname === "/api/images/date") {
+    try {
+      const date = urlObj.searchParams.get("date");
+      if (!date) {
+        res.writeHead(400, {"Content-Type":"application/json"});
+        return res.end(JSON.stringify({ error:"Falta parámetro date" }));
+      }
+      const [rows] = await pool.query(
+        `SELECT * FROM imagenes WHERE DATE(uploaded_at) = ?`,
+        [date]
+      );
+      res.writeHead(200, {"Content-Type":"application/json"});
+      return res.end(JSON.stringify(rows));
+    } catch (err) {
+      console.error("Error /api/images/date:", err);
+      res.writeHead(500, {"Content-Type":"application/json"});
+      return res.end(JSON.stringify({ error:"Error servidor" }));
+    }
+  }
+
+
+  // ─── 7) Cualquier otra ruta → 404 ────────────────────────────────────────────
   res.writeHead(404, {"Content-Type":"application/json"});
   res.end(JSON.stringify({ error:"Ruta no encontrada" }));
 });
