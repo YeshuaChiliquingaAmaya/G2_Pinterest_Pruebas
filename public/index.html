@@ -209,20 +209,6 @@
             });
         }
 
-        // Verificar si el usuario ya está autenticado
-        function checkAuth() {
-            const userId = localStorage.getItem('userId');
-            if (userId) {
-                authContainer.style.display = 'none';
-                pinterestContent.style.display = 'block';
-                // Establecer el botón Inicio como activo por defecto
-                setActiveButton('inicio');
-                loadImages();
-            } else {
-                authContainer.style.display = 'flex';
-                pinterestContent.style.display = 'none';
-            }
-        }
         // Función para mostrar mensaje de sin resultados
         function showNoResultsMessage(searchQuery) {
             imageGrid.innerHTML = `
@@ -492,7 +478,8 @@
             checkAuth();
         });
 
-        function checkAuth() {
+// Verificar si el usuario ya está autenticado
+function checkAuth() {
     const userId = localStorage.getItem('userId');
     const userName = localStorage.getItem('userName');
 
@@ -503,25 +490,27 @@
         // Mostrar saludo con nombre
         const userGreeting = document.getElementById('userGreeting');
         const userNameDisplay = document.getElementById('userNameDisplay');
-        if(userGreeting && userNameDisplay) {
+        if (userGreeting && userNameDisplay) {
             userNameDisplay.textContent = userName || 'Usuario';
             userGreeting.style.display = 'block';
         }
 
-        loadImages();
+        // Establecer el botón de inicio como activo por defecto
+        setActiveButton('inicio');
+        loadImages();  // Cargar las imágenes si el usuario está autenticado
     } else {
         authContainer.style.display = 'flex';
         pinterestContent.style.display = 'none';
 
         // Ocultar saludo si no hay sesión
         const userGreeting = document.getElementById('userGreeting');
-        if(userGreeting) userGreeting.style.display = 'none';
+        if (userGreeting) userGreeting.style.display = 'none';
     }
 }
 
-        // Inicializar la aplicación
-        checkAuth();
-    
+// Llamada única a la función checkAuth() en el código
+checkAuth();
+
         // Función para manejar el visor de imágenes
         function initImageViewer() {
             const imageViewer = document.getElementById('imageViewer');

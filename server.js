@@ -135,8 +135,11 @@ if (req.method === 'POST' && pathname === '/upload') {
       return res.end(JSON.stringify({ error:'Falta user_id en la query' }));
     }
   
-    const form = new formidable.IncomingForm({ multiples: false });
-    return form.parse(req, async (err, fields, files) => {
+const form = new formidable.IncomingForm({ 
+    multiples: false,
+    maxFileSize: 10 * 1024 * 1024
+    });   
+     return form.parse(req, async (err, fields, files) => {
       if (err) {
         console.error('Error parseando formulario:', err);
         res.writeHead(500, { 'Content-Type':'application/json' });
