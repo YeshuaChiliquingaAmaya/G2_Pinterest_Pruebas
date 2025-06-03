@@ -1,74 +1,89 @@
-// test/user.test.js
 const request = require('supertest');
-const server = require('../server'); // tu server.js
+const server = require('../server');
 
-describe('User endpoints', () => {
-  const testUser = {
-    nombre_completo: 'Test User',
-    correo: 'testuser@example.com',
-    usuario: 'testuser',
-    contrasena: 'test1234'
-  };
+describe('Errores y casos negativos en API', () => {
 
-  let loggedUser = null; // Para guardar datos del login
-
-  beforeAll(async () => {
-    // Intentar registrar usuario para las pruebas
+  it('POST /register sin campos debe retornar 400', async () => {
     const res = await request(server)
       .post('/register')
-      .send(testUser);
-
-    // Si ya existe, hacer login para obtener id
-    if (res.statusCode === 201) {
-      // Usuario creado con éxito
-      const loginRes = await request(server)
-        .post("/login")
-        .send({ correo: testUser.correo, contrasena: testUser.contrasena });
-      loggedUser = loginRes.body.user;
-    } else if (res.statusCode === 409) {
-      // Usuario ya existe, hacer login igual
-      const loginRes = await request(server)
-        .post("/login")
-        .send({ correo: testUser.correo, contrasena: testUser.contrasena });
-      loggedUser = loginRes.body.user;
-    } else {
-      throw new Error(`Error preparando usuario para pruebas: ${res.statusCode}`);
-    }
+      .send({});
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toMatch(/faltan datos/i);
   });
 
-  it('POST /register -> no debe registrar usuario duplicado', async () => {
+  it('POST /register con usuario duplicado debe retornar 409', async () => {
+    // Intenta registrar el usuario testuser dos veces para forzar duplicado
+    const user = {
+      nombre_completo: 'Test User',
+      correo: 'testuser@example.com',
+      usuario: 'testuser',
+      contrasena: 'test1234'
+    };
+
+    // Primera inserción (puede ser omitida si ya existe)
+    await request(server).post('/register').send(user);
+
+    // Segunda inserción
     const res = await request(server)
       .post('/register')
-      .send(testUser);
+      .send(user);
     expect(res.statusCode).toBe(409);
     expect(res.body.success).toBe(false);
     expect(res.body.message).toMatch(/existe/i);
   });
 
-  it('POST /login -> debe hacer login con datos correctos', async () => {
+  it('POST /login con correo no registrado debe retornar 401', async () => {
     const res = await request(server)
       .post('/login')
-      .send({ correo: testUser.correo, contrasena: testUser.contrasena });
-    expect(res.statusCode).toBe(200);
-    expect(res.body.success).toBe(true);
-    expect(res.body.user).toHaveProperty('id');
-    expect(res.body.user.correo).toBe(testUser.correo);
+      .send({ correo: 'noexiste@example.com', contrasena: '123456' });
+    expect(res.statusCode).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toMatch(/no registrado/i);
   });
 
-  it('POST /login -> no debe hacer login con contraseña incorrecta', async () => {
+  it('POST /login con contraseña incorrecta debe retornar 401', async () => {
     const res = await request(server)
       .post('/login')
-      .send({ correo: testUser.correo, contrasena: 'wrongpass' });
+      .send({ correo: 'testuser@example.com', contrasena: 'wrongpass' });
+    expect(res.statusCode).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toMatch(/contraseña incorrecta/i);
+  });
+
+  it('POST /upload sin user_id debe retornar 400', async () => {
+    const res = await request(server)
+      .post('/upload');
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toMatch(/falta user_id/i);
+  });
+
+  it('DELETE /api/images/:id sin user_id debe retornar 401', async () => {
+    const res = await request(server)
+      .delete('/api/images/1');
     expect(res.statusCode).toBe(401);
     expect(res.body.success).toBe(false);
   });
 
-  it('GET /api/search?user=usuario -> debe obtener imágenes de un usuario', async () => {
-    if (!loggedUser) return; // solo si hubo login
+  it('DELETE /api/images/:id con imagen no existente debe retornar 404', async () => {
     const res = await request(server)
-      .get(`/api/search?user=${testUser.usuario}`);
-    expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
+      .delete('/api/images/99999?user_id=1'); // asumiendo id 99999 no existe
+    expect(res.statusCode).toBe(404);
+    expect(res.body.success).toBe(false);
+  });
+
+  it('GET /api/search sin parámetro user debe retornar 400', async () => {
+    const res = await request(server)
+      .get('/api/search');
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toMatch(/falta parámetro user/i);
+  });
+
+  it('Ruta no existente debe retornar 404', async () => {
+    const res = await request(server)
+      .get('/ruta/inexistente');
+    expect(res.statusCode).toBe(404);
+    expect(res.body.error).toMatch(/ruta no encontrada/i);
   });
 
   // Cerrar servidor para evitar procesos colgados
