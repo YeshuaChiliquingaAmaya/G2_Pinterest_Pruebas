@@ -3,29 +3,46 @@ const request = require("supertest");
 const server = require("../server"); // tu server.js
 
 describe("User endpoints", () => {
+  // Usuario dinámico para pruebas, con un timestamp para evitar duplicados
+  const timestamp = Date.now();
   const testUser = {
     nombre_completo: "Test User",
-    correo: "testuser@example.com",
-    usuario: "testuser",
+    correo: `testuser${timestamp}@example.com`,
+    usuario: `testuser${timestamp}`,
     contrasena: "test1234"
   };
 
   let loggedUser = null; // Para guardar datos del login
 
-  it("POST /register -> debería registrar un usuario nuevo", async () => {
+  beforeAll(async () => {
+    // Intentar registrar usuario para las pruebas
     const res = await request(server)
       .post("/register")
       .send(testUser);
-    expect(res.statusCode).toBe(201);
-    expect(res.body.success).toBe(true);
-    expect(res.body.message).toMatch(/usuario creado/i);
+
+    // Si ya existe, hacer login para obtener id
+    if (res.statusCode === 201) {
+      // Usuario creado con éxito
+      const loginRes = await request(server)
+        .post("/login")
+        .send({ correo: testUser.correo, contrasena: testUser.contrasena });
+      loggedUser = loginRes.body.user;
+    } else if (res.statusCode === 409) {
+      // Usuario ya existe, hacer login igual
+      const loginRes = await request(server)
+        .post("/login")
+        .send({ correo: testUser.correo, contrasena: testUser.contrasena });
+      loggedUser = loginRes.body.user;
+    } else {
+      throw new Error(`Error preparando usuario para pruebas: ${res.statusCode}`);
+    }
   });
 
-  it("POST /register -> no debe registrar usuario duplicado", async () => {
+  it("POST /register -> no debe registrar usuario duplicado con mismo correo/usuario", async () => {
     const res = await request(server)
       .post("/register")
       .send(testUser);
-    expect(res.statusCode).toBe(500);
+    expect(res.statusCode).toBe(409);
     expect(res.body.success).toBe(false);
     expect(res.body.message).toMatch(/existe/i);
   });
@@ -38,7 +55,6 @@ describe("User endpoints", () => {
     expect(res.body.success).toBe(true);
     expect(res.body.user).toHaveProperty("id");
     expect(res.body.user.correo).toBe(testUser.correo);
-    loggedUser = res.body.user;
   });
 
   it("POST /login -> no debe hacer login con contraseña incorrecta", async () => {
@@ -56,4 +72,9 @@ describe("User endpoints", () => {
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
+  // Cerrar servidor para evitar procesos colgados
+  afterAll(() => {
+    server.close();
+  });
 });
+

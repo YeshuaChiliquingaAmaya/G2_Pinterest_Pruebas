@@ -79,7 +79,7 @@ const server = http.createServer(async (req, res) => {
       } catch (err) {
         console.error("Error /register:", err);
         const msg = err.code === "ER_DUP_ENTRY" ? "Correo o usuario ya existe" : "Error interno";
-        res.writeHead(500, {"Content-Type":"application/json"});
+        res.writeHead(409 , {"Content-Type":"application/json"});
         return res.end(JSON.stringify({ success:false, message: msg }));
       }
     });

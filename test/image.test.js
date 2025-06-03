@@ -6,13 +6,13 @@ const server = require("../server");
 describe("Image endpoints", () => {
   // Para pruebas necesitaremos user_id (deberías tener uno en tu DB, o usar el del login)
   // Aquí asumimos un usuario test con id 1 (puedes cambiarlo)
-  const userId = 1;
+  const userId = 17;
   let uploadedImageId = null;
 
   it("POST /upload?user_id=… -> debería subir imagen", async () => {
     const res = await request(server)
       .post(`/upload?user_id=${userId}`)
-      .attach("image", path.resolve(__dirname, "../public/images/pinteres.icon"));
+      .attach("image", path.resolve(__dirname, "../public/images/Pinterest_icon.png"));
     
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty("url");
@@ -38,4 +38,9 @@ describe("Image endpoints", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
   });
+    afterAll(() => {
+    server.close();
+    });
 });
+
+

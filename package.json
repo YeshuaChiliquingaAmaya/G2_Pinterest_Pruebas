@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "start.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
     "test": "jest",
-    "start": "node start.js"
+    "start": "node start.js",
+    "jest": "jest --coverage"
   },
   "keywords": [],
   "author": "",
