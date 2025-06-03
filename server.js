@@ -307,7 +307,6 @@ if (req.method === "POST" && pathname === "/upload") {
   }));
 });
 
-server.listen(3000, () =>
-  console.log("Servidor corriendo en http://localhost:3000")
-);
 
+
+module.exports = server;
